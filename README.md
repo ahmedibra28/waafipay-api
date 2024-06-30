@@ -44,11 +44,11 @@ Include the following request payload:
   "amount": 0.01, // Payment amount
   "customReference": "123", // Custom reference or identifier for the payment
   "description": "testing new approach of purchase", // Description or note for the payment
-  "accountNumberToWithdraw": "615301507", // Mobile number or account number for the owner of the web or e-commerce platform
   "credentials": {
     "merchantUId": "************", // Your unique merchant ID provided by WaafiPay
     "apiUId": "************", // Your unique API user ID provided by WaafiPay
-    "apiKey": "************" // Your API key provided by WaafiPay
+    "apiKey": "************", // Your API key provided by WaafiPay
+    "accountNumberToWithdraw": "615301507" // Mobile number or account number for the owner of the web or e-commerce platform
   }
 }
 ```
@@ -92,7 +92,8 @@ Include the following request payload:
   "credentials": {
     "merchantUId": "************", // Your unique merchant ID provided by WaafiPay
     "apiUId": "************", // Your unique API user ID provided by WaafiPay
-    "apiKey": "************" // Your API key provided by WaafiPay
+    "apiKey": "************", // Your API key provided by WaafiPay
+    "accountNumberToWithdraw": "615301507" // Mobile number or account number for the owner of the web or e-commerce platform
   }
 }
 ```
@@ -124,4 +125,4 @@ Through the integration API, developers can initiate payments and handle refunds
 
 We hope this documentation provides you with the necessary information to integrate the WaafiPay Payment Integration API into your web application successfully. Should you have any further questions or require assistance, please don't hesitate to reach out.
 
-Note: The placeholders ****\*\*\*\***** represent values specific to your integration and should be replaced accordingly.
+Note: The placeholders \***\*\*\*\*\*\*\*** represent values specific to your integration and should be replaced accordingly.
