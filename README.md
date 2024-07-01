@@ -42,13 +42,13 @@ Include the following request payload:
 {
   "mobile": "770022200", // Mobile number of the customer making the payment
   "amount": 0.01, // Payment amount
-  "customReference": "123", // Custom reference or identifier for the payment
-  "description": "testing new approach of purchase", // Description or note for the payment
+  "customReference": "123", // Custom reference or identifier for the payment which is not required
+  "description": "testing new approach of purchase", // Description or note for the payment which is not required
   "credentials": {
     "merchantUId": "************", // Your unique merchant ID provided by WaafiPay
     "apiUId": "************", // Your unique API user ID provided by WaafiPay
     "apiKey": "************", // Your API key provided by WaafiPay
-    "accountNumberToWithdraw": "615301507" // Mobile number or account number for the owner of the web or e-commerce platform
+    "accountNumberToWithdraw": "615301507" // Mobile number or account number for the owner of the web or e-commerce platform it's required only if you want to activate auto-withdraw
   }
 }
 ```
@@ -73,7 +73,7 @@ Upon successfully initializing a payment, you will receive a response with the f
 
 ## Refund Payment
 
-### Refund Payment Request
+### Refund Payment Request (do this within three days)
 
 To cancel a payment or issue a refund, make a POST request to the following endpoint:
 
@@ -87,13 +87,12 @@ Include the following request payload:
 {
   "transactionId": "40439443", // ID of the transaction to be canceled or refunded
   "reason": "testing new approach of refund", // Reason for canceling the payment or issuing a refund
-  "customReference": "123456", // Custom reference or identifier for the refund
+  "customReference": "123456", // Custom reference or identifier for the refund which is not required
   "amount": 0.5, // Amount to be refunded
   "credentials": {
     "merchantUId": "************", // Your unique merchant ID provided by WaafiPay
     "apiUId": "************", // Your unique API user ID provided by WaafiPay
-    "apiKey": "************", // Your API key provided by WaafiPay
-    "accountNumberToWithdraw": "615301507" // Mobile number or account number for the owner of the web or e-commerce platform
+    "apiKey": "************" // Your API key provided by WaafiPay
   }
 }
 ```
@@ -112,6 +111,12 @@ Upon successfully canceling a payment or issuing a refund, you will receive a re
   "message": "Refund has been done successfully" // Success message
 }
 ```
+
+## Important Notice
+
+When utilizing the WaafiPay Payment Integration API, please note the following:
+
+Refunds: You can initiate refunds within 3 days of the original payment. WaafiPay allows you to cancel payments made within the last 3 days. If you need to cancel a payment beyond this timeframe, please contact WaafiPay directly for assistance.
 
 ## Conclusion
 

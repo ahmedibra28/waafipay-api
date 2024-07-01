@@ -12,7 +12,7 @@ import { waafiPayRefund } from './lib/waafipay/refund'
 
 const app = new Hono().basePath('/api/v1')
 
-app.post('/transactions/initialize', async (c) => {
+app.post('/payments/initialize', async (c) => {
   try {
     const { mobile, amount, customReference, description, credentials } =
       (await c.req.json()) as {
@@ -125,7 +125,7 @@ app.post('/transactions/initialize', async (c) => {
   }
 })
 
-app.post('/transactions/refund', async (c) => {
+app.post('/payments/refund', async (c) => {
   try {
     const { customReference, transactionId, reason, amount, credentials } =
       (await c.req.json()) as {
