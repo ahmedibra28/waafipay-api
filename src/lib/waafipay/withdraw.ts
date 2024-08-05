@@ -25,7 +25,7 @@ export const waafiPayWithdraw = async ({
       }
     }
 
-    const providerCommissionAmount = Number(amount) * 0.01
+    const providerCommissionAmount = Number(amount) * 0.02
 
     const withdrawalObject = {
       schemaVersion: '1.0',
