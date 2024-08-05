@@ -12,6 +12,10 @@ import { waafiPayRefund } from './lib/waafipay/refund'
 
 const app = new Hono().basePath('/api/v1')
 
+app.get('/', (c) => {
+  return c.json({ message: 'Welcome to WaafiPay API 🚀' })
+})
+
 app.post('/payments/initialize', async (c) => {
   try {
     const { mobile, amount, customReference, description, credentials } =
