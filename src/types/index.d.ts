@@ -28,4 +28,5 @@ export interface WaafiPayProp {
   amount: number
   mobile?: string
   accountNumberToWithdraw?: string | null
+  business?: string
 }

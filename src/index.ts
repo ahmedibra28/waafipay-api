@@ -13,7 +13,7 @@ import { waafiPayRefund } from './lib/waafipay/refund'
 const app = new Hono().basePath('/api/v1')
 
 app.get('/', (c) => {
-  return c.json({ message: 'Welcome to WaafiPay API 🚀' })
+  return c.json({ message: 'Welcome to WaafiPay API (v2) 🚀' })
 })
 
 app.post('/payments/initialize', async (c) => {
@@ -31,6 +31,8 @@ app.post('/payments/initialize', async (c) => {
           accountNumberToWithdraw: string
         }
       }
+
+    const business = c.req.query('business')
 
     if (!amount) return getErrorResponse(c, `Missing amount`, 400)
     if (Number(amount) <= 0)
@@ -89,6 +91,7 @@ app.post('/payments/initialize', async (c) => {
         ...waafiPayObject,
         description: description || withdrawalDescription,
         accountNumberToWithdraw: credentials?.accountNumberToWithdraw,
+        business,
       })
 
       if (withdraw.status === 500) {
