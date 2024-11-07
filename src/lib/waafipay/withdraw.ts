@@ -39,7 +39,7 @@ export const waafiPayWithdraw = async ({
       requestId: referenceId,
       timestamp: Date.now(),
       channelName: 'WEB',
-      serviceName: 'API_CREDITACCOUNT',
+      serviceName: 'API_CREDIT_MERCHANT',
       serviceParams: {
         merchantUid: merchantUId,
         apiUserId: apiUId,
