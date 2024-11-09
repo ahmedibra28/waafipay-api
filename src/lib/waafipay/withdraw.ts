@@ -26,11 +26,14 @@ export const waafiPayWithdraw = async ({
       }
     }
 
-    const businessesWithTwoPercentCommission = ['healthcare', 'education']
-    const commission =
-      business && businessesWithTwoPercentCommission.includes(business)
-        ? 0.01
-        : 0.02
+    // INFO: Allow this if WaafiPay changes their commission structure
+    // const businessesWithTwoPercentCommission = ['healthcare', 'education']
+    // const commission =
+    //   business && businessesWithTwoPercentCommission.includes(business)
+    //     ? 0.01
+    //     : 0.02
+
+    const commission = 0.01
 
     const providerCommissionAmount = Number(amount) * commission
 
@@ -73,7 +76,8 @@ export const waafiPayWithdraw = async ({
         status: data.status,
       }
 
-    const response = await data.json()
+    const response: WaafiPayResponse & Error & { status: number } =
+      await data.json()
 
     if (response.responseCode !== '2001') {
       throw {

@@ -4,7 +4,7 @@
 
 import { WaafiPayProp, WaafiPayResponse } from '@/types'
 
-export const waafiPayPurchase = async ({
+export const waafiPayPreAuthorize = async ({
   merchantUId,
   apiUId,
   apiKey,
@@ -14,12 +14,12 @@ export const waafiPayPurchase = async ({
   mobile,
 }: WaafiPayProp): Promise<WaafiPayResponse & Error & { status: number }> => {
   try {
-    const paymentObject = {
+    const obj = {
       schemaVersion: '1.0',
       requestId: referenceId,
       timestamp: Date.now(),
       channelName: 'WEB',
-      serviceName: 'API_PURCHASE',
+      serviceName: 'API_PREAUTHORIZE',
       serviceParams: {
         merchantUid: merchantUId,
         apiUserId: apiUId,
@@ -43,12 +43,12 @@ export const waafiPayPurchase = async ({
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(paymentObject),
+      body: JSON.stringify(obj),
     })
 
     if (!data.ok)
       throw {
-        message: data.statusText || 'Failed to make payment request',
+        message: data.statusText || 'Failed to make pre-authorize request',
         status: data.status,
       }
 
