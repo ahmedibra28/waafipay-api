@@ -454,6 +454,88 @@ app.post('/payments/pre-authorize/cancel', async (c) => {
   }
 })
 
+app.post('/payments/withdraw', async (c) => {
+  try {
+    const { amount, description, credentials } = (await c.req.json()) as {
+      amount: number
+      description?: string
+      credentials: {
+        merchantUId: string
+        apiUId: string
+        apiKey: string
+        accountNumberToWithdraw: string
+      }
+    }
+
+    if (!amount) return getErrorResponse(c, `Missing amount`, 400)
+    if (Number(amount) <= 0)
+      return getErrorResponse(c, `Amount must be greater than 0`, 400)
+
+    if (!credentials) return getErrorResponse(c, `Missing credentials`, 400)
+
+    // check if the credentials are valid
+    const { merchantUId, apiUId, apiKey } = credentials
+    if (!merchantUId || !apiUId || !apiKey)
+      return getErrorResponse(c, `Missing credentials`, 400)
+
+    if (!isValidApiKey(credentials.apiKey)) {
+      return getErrorResponse(c, 'API key is not valid', 400)
+    }
+
+    if (
+      credentials?.accountNumberToWithdraw &&
+      !isValidateWithdrawAccount(credentials?.accountNumberToWithdraw)
+    ) {
+      return getErrorResponse(c, 'Account number to withdraw is not valid', 400)
+    }
+
+    const referenceId = uuidv4()
+
+    const waafiPayObject = {
+      merchantUId: merchantUId,
+      apiUId: apiUId,
+      apiKey: apiKey,
+      referenceId,
+      amount,
+    }
+
+    const withdrawalDescription = `${amount} dollars has been withdrawn to ${credentials?.accountNumberToWithdraw} via system`
+
+    const withdraw = await waafiPayWithdraw({
+      ...waafiPayObject,
+      description: description || withdrawalDescription,
+      accountNumberToWithdraw: credentials?.accountNumberToWithdraw,
+      business: undefined,
+    })
+
+    if (withdraw.status === 500) {
+      return getErrorResponse(c, withdraw.message, 500)
+    }
+
+    const newResponse = {
+      id: referenceId,
+      timestamp: withdraw.timestamp,
+      transactionId: withdraw.params?.transactionId,
+      referenceId: withdraw.params?.referenceId,
+      amount: withdraw.params?.txAmount,
+      description: description || withdrawalDescription,
+      message: 'Withdrawal has been done successfully',
+    }
+
+    return c.json(newResponse)
+  } catch ({ status = 500, message }: any) {
+    return c.json(
+      {
+        status: status < 500 ? 'fail' : 'error',
+        error: message ? message : null,
+      },
+      {
+        status,
+      }
+    )
+  }
+})
+
 app.notFound((c) => {
   return c.json({ error: 'Not found' }, 404)
 })
