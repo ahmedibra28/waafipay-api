@@ -33,7 +33,15 @@ export const waafiPayWithdraw = async ({
     //     ? 0.01
     //     : 0.02
 
-    const commission = 0.01
+    let commission = 0.0
+
+    if (Number(amount) <= 0.5) {
+      commission = 0
+    } else if (Number(amount) > 0.5 && Number(amount) <= 10) {
+      commission = 0.01
+    } else if (Number(amount) > 10) {
+      commission = 0.02
+    }
 
     const providerCommissionAmount = Number(amount) * commission
 
