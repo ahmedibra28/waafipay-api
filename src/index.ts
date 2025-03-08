@@ -218,11 +218,8 @@ app.post('/payments/pre-authorize', async (c) => {
           merchantUId: string
           apiUId: string
           apiKey: string
-          accountNumberToWithdraw: string
         }
       }
-
-    const business = c.req.query('business')
 
     if (!amount) return getErrorResponse(c, `Missing amount`, 400)
     if (Number(amount) <= 0)
@@ -244,51 +241,22 @@ app.post('/payments/pre-authorize', async (c) => {
       return getErrorResponse(c, 'API key is not valid', 400)
     }
 
-    if (
-      credentials?.accountNumberToWithdraw &&
-      !isValidateWithdrawAccount(credentials?.accountNumberToWithdraw)
-    ) {
-      return getErrorResponse(c, 'Account number to withdraw is not valid', 400)
-    }
-
     const referenceId = uuidv4()
 
-    const waafiPayObject = {
+    const purchaseDescription = `${mobile} has paid ${amount} dollars`
+
+    const response = await waafiPayPreAuthorize({
       merchantUId: merchantUId,
       apiUId: apiUId,
       apiKey: apiKey,
       referenceId,
       amount,
       mobile,
-    }
-
-    const purchaseDescription = `${mobile} has paid ${amount} dollars`
-    const withdrawalDescription = `${amount} dollars has been withdrawn to ${credentials?.accountNumberToWithdraw} via system`
-
-    const response = await waafiPayPreAuthorize({
-      ...waafiPayObject,
       description: description || purchaseDescription,
     })
 
     if (response.status === 500) {
       return getErrorResponse(c, response.message, 500)
-    }
-
-    let withdrawResponse: any = null
-
-    if (credentials?.accountNumberToWithdraw) {
-      const withdraw = await waafiPayWithdraw({
-        ...waafiPayObject,
-        description: description || withdrawalDescription,
-        accountNumberToWithdraw: credentials?.accountNumberToWithdraw,
-        business,
-      })
-
-      if (withdraw.status === 500) {
-        withdrawResponse = {
-          error: withdraw.message,
-        }
-      }
     }
 
     const newResponse = {
@@ -301,11 +269,6 @@ app.post('/payments/pre-authorize', async (c) => {
       customReference,
       description: description || purchaseDescription,
       message: 'Payment has been done successfully',
-      ...(withdrawResponse && {
-        withdraw: {
-          error: withdrawResponse?.error,
-        },
-      }),
     }
 
     return c.json(newResponse)
@@ -324,17 +287,26 @@ app.post('/payments/pre-authorize', async (c) => {
 
 app.post('/payments/pre-authorize/commit', async (c) => {
   try {
-    const { customReference, transactionId, description, credentials } =
-      (await c.req.json()) as {
-        customReference?: string
-        transactionId: number | string
-        description?: string
-        credentials: {
-          merchantUId: string
-          apiUId: string
-          apiKey: string
-        }
+    const {
+      customReference,
+      transactionId,
+      description,
+      credentials,
+      amount,
+      mobile,
+    } = (await c.req.json()) as {
+      mobile: string
+      amount: number
+      customReference?: string
+      transactionId: number | string
+      description?: string
+      credentials: {
+        merchantUId: string
+        apiUId: string
+        apiKey: string
+        accountNumberToWithdraw?: string
       }
+    }
 
     if (!transactionId) return getErrorResponse(c, `Missing transactionId`, 400)
     if (!credentials) return getErrorResponse(c, `Missing credentials`, 400)
@@ -348,13 +320,25 @@ app.post('/payments/pre-authorize/commit', async (c) => {
       return getErrorResponse(c, 'API key is not valid', 400)
     }
 
+    if (
+      credentials?.accountNumberToWithdraw &&
+      !isValidateWithdrawAccount(credentials?.accountNumberToWithdraw)
+    ) {
+      return getErrorResponse(c, 'Account number to withdraw is not valid', 400)
+    }
+
     const referenceId = uuidv4()
 
-    const response = await waafiPayPreAuthorizeCommit({
+    const waafiPayObject = {
       merchantUId: credentials.merchantUId,
       apiUId: credentials.apiUId,
       apiKey: credentials.apiKey,
       referenceId,
+      amount,
+    }
+
+    const response = await waafiPayPreAuthorizeCommit({
+      ...waafiPayObject,
       amount: 0,
       transactionId: Number(transactionId),
       description: description || `Pre-authorized commit for ${transactionId}`,
@@ -362,6 +346,25 @@ app.post('/payments/pre-authorize/commit', async (c) => {
 
     if (response.status === 500) {
       return getErrorResponse(c, response.message, 500)
+    }
+
+    let withdrawResponse: any = null
+
+    if (credentials?.accountNumberToWithdraw) {
+      const withdraw = await waafiPayWithdraw({
+        ...waafiPayObject,
+        description:
+          description ||
+          `${amount} dollars has been withdrawn to ${credentials?.accountNumberToWithdraw} via system`,
+        accountNumberToWithdraw: credentials?.accountNumberToWithdraw,
+        mobile,
+      })
+
+      if (withdraw.status === 500) {
+        withdrawResponse = {
+          error: withdraw.message,
+        }
+      }
     }
 
     const newResponse = {
@@ -372,6 +375,11 @@ app.post('/payments/pre-authorize/commit', async (c) => {
       customReference,
       description: description || response.params?.description,
       message: 'Pre-authorized commit has been done successfully',
+      ...(withdrawResponse && {
+        withdraw: {
+          error: withdrawResponse?.error,
+        },
+      }),
     }
 
     return c.json(newResponse)
