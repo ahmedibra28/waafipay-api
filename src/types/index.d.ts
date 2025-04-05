@@ -9,6 +9,7 @@ export interface WaafiPayResponse {
     accountNo: string
     accountType: string
     state: string
+    merchantCharges: string
     referenceId: string
     transactionId: string
     issuerTransactionId: string

@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@cloudflare/workerd-darwin-arm64':
+        specifier: ^1.20250321.0
+        version: 1.20250321.0
       hono:
         specifier: ^4.4.9
         version: 4.4.9
@@ -39,6 +42,12 @@ packages:
 
   '@cloudflare/workerd-darwin-arm64@1.20240620.1':
     resolution: {integrity: sha512-3rdND+EHpmCrwYX6hvxIBSBJ0f40tRNxond1Vfw7GiR1MJVi3gragiBx75UDFHCxfRw3J0GZ1qVlkRce2/Xbsg==}
+    engines: {node: '>=16'}
+    cpu: [arm64]
+    os: [darwin]
+
+  '@cloudflare/workerd-darwin-arm64@1.20250321.0':
+    resolution: {integrity: sha512-qvf7/gkkQq7fAsoMlntJSimN/WfwQqxi2oL0aWZMGodTvs/yRHO2I4oE0eOihVdK1BXyBHJXNxEvNDBjF0+Yuw==}
     engines: {node: '>=16'}
     cpu: [arm64]
     os: [darwin]
@@ -527,6 +536,8 @@ snapshots:
 
   '@cloudflare/workerd-darwin-arm64@1.20240620.1':
     optional: true
+
+  '@cloudflare/workerd-darwin-arm64@1.20250321.0': {}
 
   '@cloudflare/workerd-linux-64@1.20240620.1':
     optional: true
