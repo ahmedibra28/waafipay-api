@@ -35,8 +35,6 @@ app.post('/payments/initialize', async (c) => {
         }
       }
 
-    const business = c.req.query('business')
-
     if (!amount) return getErrorResponse(c, `Missing amount`, 400)
     if (Number(amount) <= 0)
       return getErrorResponse(c, `Amount must be greater than 0`, 400)
@@ -92,9 +90,8 @@ app.post('/payments/initialize', async (c) => {
     if (credentials?.accountNumberToWithdraw) {
       const withdraw = await waafiPayWithdraw({
         ...waafiPayObject,
-        description: description || withdrawalDescription,
+        description: withdrawalDescription,
         accountNumberToWithdraw: credentials?.accountNumberToWithdraw,
-        business,
       })
 
       if (withdraw.status === 500) {
@@ -110,6 +107,7 @@ app.post('/payments/initialize', async (c) => {
       transactionId: response.params?.transactionId,
       referenceId: response.params?.referenceId,
       amount: response.params?.txAmount,
+      charges: response.params?.merchantCharges,
       mobile,
       customReference,
       description: description || purchaseDescription,

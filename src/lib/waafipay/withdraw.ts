@@ -13,7 +13,6 @@ export const waafiPayWithdraw = async ({
   description,
   amount,
   mobile,
-  business,
 }: WaafiPayProp): Promise<WaafiPayResponse & Error & { status: number }> => {
   try {
     const isWithdrawable = Boolean(accountNumberToWithdraw)
@@ -27,22 +26,8 @@ export const waafiPayWithdraw = async ({
     }
 
     // INFO: Allow this if WaafiPay changes their commission structure
-    // const businessesWithTwoPercentCommission = ['healthcare', 'education']
-    // const commission =
-    //   business && businessesWithTwoPercentCommission.includes(business)
-    //     ? 0.01
-    //     : 0.02
 
-    let commission = 0.0
-
-    if (Number(amount) <= 0.5) {
-      commission = 0
-    } else if (Number(amount) > 0.5 && Number(amount) <= 10) {
-      commission = 0.01
-    } else if (Number(amount) > 10) {
-      commission = 0.02
-    }
-
+    const commission = 0.02
     const providerCommissionAmount = Number(amount) * commission
 
     const withdrawalObject = {
