@@ -18,11 +18,11 @@ export const isValidApiKey = (apiKey: string): boolean => {
 }
 
 export const isValidateWithdrawAccount = (value: string): boolean => {
-  const allowedPrefixes = ['107', '6', '7']
+  // const allowedPrefixes = ['107', '6', '7']
 
   return (
-    allowedPrefixes.some((prefix) => value.startsWith(prefix)) &&
-    value.length === 9
+    // allowedPrefixes.some((prefix) => value.startsWith(prefix)) &&
+    value.length === 6
   )
 }
 

@@ -18,7 +18,7 @@ export const waafiPayWithdraw = async ({
     const isWithdrawable = Boolean(accountNumberToWithdraw)
     let withdrawTo = ''
     if (isWithdrawable) {
-      if (accountNumberToWithdraw?.startsWith('1')) {
+      if (accountNumberToWithdraw?.length === 6) {
         withdrawTo = 'MERCHANT'
       } else {
         withdrawTo = 'CUSTOMER'
