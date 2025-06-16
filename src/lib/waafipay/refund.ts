@@ -47,7 +47,7 @@ export const waafiPayRefund = async ({
     const response: WaafiPayResponse & Error & { status: number } =
       await data.json()
 
-    if (response.responseCode !== '2001' && !response?.params?.transactionId) {
+    if (response.responseCode !== '2001' || !response?.params?.transactionId) {
       throw {
         message: response.params?.description || response.responseMsg,
         status: 500,
