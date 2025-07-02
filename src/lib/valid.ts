@@ -44,3 +44,18 @@ export const isValidHormuudSomnet = (value: string): boolean => {
   const valid = [...hormuud, ...somnet, ...golis, ...telesom, ...soltelco]
   return valid.includes(key)
 }
+
+export const isValidSomtel = (value: string): boolean => {
+  if (value.length !== 9) return false
+
+  const providers = {
+    somtel: ['62', '65', '66'],
+  }
+
+  const { somtel } = providers
+
+  const key = value.substring(0, 2)
+
+  const valid = [...somtel]
+  return valid.includes(key)
+}

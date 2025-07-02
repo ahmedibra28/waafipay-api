@@ -1,133 +1,284 @@
-# Introduction to WaafiPay Payment Integration API
+# 🌍 Somalia Payment API — WaafiPay & eDahab
 
-Welcome to the documentation for the WaafiPay Payment Integration API. This API provides a simplified integration solution for developers who want to incorporate WaafiPay's mobile payment services into their web applications. By using this API, developers can avoid the complexity of directly integrating with WaafiPay's API and instead interact with WaafiPay through this intermediary layer.
+Modern and secure Cloudflare Worker API to process **mobile payments** using:
 
-## Overview
+- ✅ **WaafiPay (EVC Plus)**
+- ✅ **eDahab (Somtel)**
 
-WaafiPay is a mobile payment company that allows users to make secure and convenient payments using their mobile devices. Integrating WaafiPay's services into your web application can enhance the payment experience for your users and enable seamless transactions.
+Built with [Hono.js](https://hono.dev) and designed to serve developers building fintech, top-up, or online services in Somalia 🇸🇴.
 
-To simplify the integration process, we have created the WaafiPay Payment Integration API. This API acts as a bridge between your web application and WaafiPay, handling the necessary communication and processing on your behalf. By using this API, you can easily initiate payments and handle refunds without the need to directly interact with WaafiPay's extensive API documentation.
+---
 
-## Benefits of Using the Integration API
+## 🚀 Features
 
-The WaafiPay Payment Integration API offers several advantages for developers:
+- 📲 WaafiPay Purchase (with optional auto-withdraw)
+- 💸 Withdraw directly to a mobile wallet
+- ↩️ Refunds for completed WaafiPay transactions
+- 🧾 eDahab Issue Invoice
+- 💰 eDahab Credit Invoice (to customer or agent)
 
-1\. Simplified Integration: With this API, developers no longer need to navigate through the complexities of integrating directly with WaafiPay's API. The integration process is streamlined and made more accessible.
+---
 
-2\. Enhanced Efficiency: By utilizing the integration API, developers can save time and effort in understanding and implementing the intricacies of WaafiPay's API. The API abstracts away the technical details, allowing developers to focus on integrating payment functionality seamlessly.
+## 📦 Tech Stack
 
-3\. Consistent Integration Experience: The integration API provides a standardized interface for interacting with WaafiPay, ensuring a consistent experience across different web applications. Developers can rely on the API's endpoints and request structures, making it easier to integrate and maintain their applications.
+- **Cloudflare Workers** – Serverless, global edge platform
+- **Hono.js** – Lightweight web framework
+- **TypeScript** – Type-safe code
+- **WaafiPay & eDahab APIs** – Local mobile money providers
 
-## Base URL
+---
 
-The base URL for accessing the simplified WaafiPay Payment Integration API is:
+## 📖 API Endpoints
+
+All routes are prefixed with:
 
 ```
-https://waafipay.ahmedibra.com
+/api/v1
 ```
 
-## Initialize Payment
+---
 
-### Initialize Payment Request
+### 📲 POST `/payments/initialize`
 
-To initiate a payment, make a POST request to the following endpoint:
+Create a WaafiPay payment (optionally followed by a withdrawal).
 
-```
-{{baseURL}}/api/v1/payments/initialize
-```
-
-Include the following request payload:
+#### ✅ Request
 
 ```json
 {
-  "mobile": "770022200", // Mobile number of the customer making the payment
-  "amount": 0.01, // Payment amount
-  "customReference": "123", // Custom reference or identifier for the payment which is not required
-  "description": "testing new approach of purchase", // Description or note for the payment which is not required
+  "mobile": "2526xxxxxxx",
+  "amount": 10,
+  "customReference": "ORDER001",
+  "description": "Top-up payment",
   "credentials": {
-    "merchantUId": "************", // Your unique merchant ID provided by WaafiPay
-    "apiUId": "************", // Your unique API user ID provided by WaafiPay
-    "apiKey": "************", // Your API key provided by WaafiPay
-    "accountNumberToWithdraw": "615301507" // Mobile number or account number for the owner of the web or e-commerce platform it's required only if you want to activate auto-withdraw
+    "merchantUId": "your-merchant-id",
+    "apiUId": "your-api-user-id",
+    "apiKey": "your-api-key",
+    "accountNumberToWithdraw": "2526xxxxxxx"
   }
 }
 ```
 
-### Initialize Payment Response
-
-Upon successfully initializing a payment, you will receive a response with the following details:
+#### ✅ Success Response
 
 ```json
 {
-  "id": "1c67b7e0-4290-4d1e-b58f-cfe839ee068d", // Payment transaction ID
-  "timestamp": "2024-06-26 13:48:28.091", // Timestamp when the payment was initiated
-  "transactionId": "40368106", // Transaction ID provided by WaafiPay
-  "referenceId": "1c67b7e0-4290-4d1e-b58f-cfe839ee068d", // Reference ID for the payment transaction
-  "amount": "0.01", // Payment amount
-  "mobile": "615301507", // Mobile number of the customer making the payment
-  "customReference": "123", // Custom reference or identifier for the payment
-  "description": "testing new approach of purchase", // Description or note for the payment
-  "message": "Payment has been done successfully" // Success message
-}
-```
-
-## Refund Payment
-
-### Refund Payment Request (do this within three days)
-
-To cancel a payment or issue a refund, make a POST request to the following endpoint:
-
-```
-{{baseURL}}/api/v1/payments/refund
-```
-
-Include the following request payload:
-
-```json
-{
-  "transactionId": "40439443", // ID of the transaction to be canceled or refunded
-  "reason": "testing new approach of refund", // Reason for canceling the payment or issuing a refund
-  "customReference": "123456", // Custom reference or identifier for the refund which is not required
-  "amount": 0.5, // Amount to be refunded
-  "credentials": {
-    "merchantUId": "************", // Your unique merchant ID provided by WaafiPay
-    "apiUId": "************", // Your unique API user ID provided by WaafiPay
-    "apiKey": "************" // Your API key provided by WaafiPay
+  "id": "REF-12345",
+  "timestamp": "2025-07-01T12:00:00Z",
+  "transactionId": "TX-456789",
+  "referenceId": "REF-12345",
+  "amount": "10.00",
+  "charges": "0.2",
+  "mobile": "2526xxxxxxx",
+  "customReference": "ORDER001",
+  "description": "Top-up payment",
+  "message": "Payment has been done successfully",
+  "withdraw": {
+    "error": "Withdrawal failed" // if applicable
   }
 }
 ```
 
-### Refund Payment Response
+---
 
-Upon successfully canceling a payment or issuing a refund, you will receive a response with the following details:
+### 💸 POST `/payments/withdraw`
+
+Withdraw money to a mobile wallet via WaafiPay.
+
+#### ✅ Request
 
 ```json
 {
-  "id": "6745832e-55ab-4a5c-8991-c90f911f7129", // Refund transaction ID
-  "timestamp": "2024-06-26 13:51:22.648", // Timestamp when the refund was processed
-  "transactionId": "40368196", // Transaction ID of the canceled payment or refund
-  "customReference": "123456", // Custom reference or identifier for the refund
-  "description": "testing new approach of refund", // Description or note for the refund
-  "message": "Refund has been done successfully" // Success message
+  "amount": 5,
+  "description": "Withdraw to user",
+  "credentials": {
+    "merchantUId": "your-merchant-id",
+    "apiUId": "your-api-user-id",
+    "apiKey": "your-api-key",
+    "accountNumberToWithdraw": "2526xxxxxxx"
+  }
 }
 ```
 
-## Important Notice
+#### ✅ Response
 
-When utilizing the WaafiPay Payment Integration API, please note the following:
+```json
+{
+  "id": "WITHDRAW-67890",
+  "timestamp": "2025-07-01T13:00:00Z",
+  "transactionId": "TX-222333",
+  "referenceId": "WITHDRAW-67890",
+  "amount": "5.00",
+  "description": "Withdraw to user",
+  "message": "Withdrawal has been done successfully"
+}
+```
 
-Refunds: You can initiate refunds within 3 days of the original payment. WaafiPay allows you to cancel payments made within the last 3 days. If you need to cancel a payment beyond this timeframe, please contact WaafiPay directly for assistance.
+---
 
-## Conclusion
+### ↩️ POST `/payments/refund`
 
-Congratulations! You have successfully integrated your web application with the WaafiPay Payment Integration API. This documentation provided you with an overview of the available endpoints, request structures, and response formats. Remember to handle authentication securely and follow best practices to ensure the safety of your users' payment information.
+Refund a previously completed WaafiPay transaction.
 
-## Summary
+#### ✅ Request
 
-The WaafiPay Payment Integration API simplifies the integration process for developers who want to incorporate WaafiPay's mobile payment services into their web applications. By utilizing this API, developers can avoid the complexities of directly integrating with WaafiPay's API and instead interact with WaafiPay through a streamlined and standardized interface.
+```json
+{
+  "transactionId": "TX-456789",
+  "amount": 10,
+  "reason": "User canceled",
+  "customReference": "ORDER001",
+  "credentials": {
+    "merchantUId": "your-merchant-id",
+    "apiUId": "your-api-user-id",
+    "apiKey": "your-api-key"
+  }
+}
+```
 
-Through the integration API, developers can initiate payments and handle refunds, providing a seamless payment experience for their users. This API offers simplicity, efficiency, and consistency, allowing developers to focus on integrating payment functionality without the need to delve into the intricacies of WaafiPay's API documentation.
+#### ✅ Response
 
-We hope this documentation provides you with the necessary information to integrate the WaafiPay Payment Integration API into your web application successfully. Should you have any further questions or require assistance, please don't hesitate to reach out.
+```json
+{
+  "id": "REFUND-78901",
+  "timestamp": "2025-07-01T14:00:00Z",
+  "transactionId": "TX-456789",
+  "referenceId": "REFUND-78901",
+  "customReference": "ORDER001",
+  "description": "User canceled",
+  "message": "Refund has been done successfully"
+}
+```
 
-Note: The placeholders \***\*\*\*\*\*\*\*** represent values specific to your integration and should be replaced accordingly.
+---
+
+### 🧾 POST `/payments/issue-invoice`
+
+Create an eDahab invoice for a mobile number.
+
+#### ✅ Request
+
+```json
+{
+  "mobile": "62xxxxxxxx",
+  "amount": 20,
+  "currency": "USD",
+  "credentials": {
+    "apiKey": "your-edahab-api-key",
+    "secret": "your-secret",
+    "agentCode": "AGENT123",
+    "accountNumberToWithdraw": "62xxxxxxxx"
+  }
+}
+```
+
+#### ✅ Response
+
+```json
+{
+  "invoiceId": "INV-12345",
+  "transactionId": "ED-TX-98765",
+  "message": "Payment has been done successfully",
+  "withdraw": {
+    "error": "Withdraw failed" // if applicable
+  }
+}
+```
+
+---
+
+### 💰 POST `/payments/credit-invoice`
+
+Withdraw or credit a specific invoice to a phone number via eDahab.
+
+#### ✅ Request
+
+```json
+{
+  "transactionId": "ED-TX-98765", // optional, will auto-generate
+  "amount": 20,
+  "currency": "USD",
+  "credentials": {
+    "apiKey": "your-api-key",
+    "secret": "your-secret",
+    "accountNumberToWithdraw": "62xxxxxxxx"
+  }
+}
+```
+
+#### ✅ Response
+
+```json
+{
+  "transactionId": "ED-TX-98765",
+  "message": "Withdrawal has been done successfully"
+}
+```
+
+---
+
+## ✅ Validation Rules
+
+- Mobile numbers must be valid: Hormuud/Somnet for WaafiPay, Somtel for eDahab.
+- Amount must be a number > 0
+- Required credentials must be present
+- Currency: `USD` or `SLSH` for eDahab
+
+---
+
+## 🛡 Error Responses
+
+Standardized error response:
+
+```json
+{
+  "status": "fail",
+  "error": "Missing amount"
+}
+```
+
+---
+
+## 🧪 Local Development
+
+1. Install dependencies:
+
+```bash
+npm install
+```
+
+2. Start dev server (with Wrangler):
+
+```bash
+npx wrangler dev src/index.ts
+```
+
+> Make sure your environment has proper `WAAFIPAY` credentials or mock setup.
+
+---
+
+## 🌍 Deployment (Cloudflare Workers)
+
+Use Wrangler:
+
+```bash
+npx wrangler deploy --minify src/index.ts
+```
+
+Configure your `wrangler.toml`:
+
+```toml
+name = "waafipay-api"
+compatibility_date = "2025-07-01"
+main = "src/index.ts"
+```
+
+---
+
+## 📧 Contact
+
+Made by **[Ahmed Ibrahim](https://ahmedibra.com)** – Founder & Developer at [TopTayo](https://toptayo.com)
+
+- Email: [info@ahmedibra.com](mailto:info@ahmedibra.com)
+
+---

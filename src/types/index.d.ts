@@ -31,3 +31,38 @@ export interface WaafiPayProp {
   accountNumberToWithdraw?: string | null
   business?: string
 }
+
+export interface EDahabIssueInvoiceProp {
+  apiKey: string
+  secret: string
+  edahabNumber: string
+  amount: number
+  agentCode: string
+  currency: 'USD' | 'SLSH'
+}
+
+export interface EDahabCreditInvoiceProp {
+  apiKey: string
+  secret: string
+  transactionAmount: number
+  phoneNumber: string
+  transactionId: string
+  currency: 'USD' | 'SLSH'
+}
+
+export interface EDahabIssueInvoiceResponse {
+  InvoiceStatus: 'Paid'
+  TransactionId: string
+  InvoiceId: string
+  StatusCode: 0
+  RequestId: number
+  StatusDescription: string
+  ValidationErrors: ?(string | null)
+}
+
+export interface EDahabCreditInvoiceResponse {
+  TransactionStatus: 'Approved'
+  TransactionMesage: string
+  PhoneNumber: string
+  TransactionId: string
+}
