@@ -46,7 +46,7 @@ Create a WaafiPay payment (optionally followed by a withdrawal).
 
 ```json
 {
-  "mobile": "2526xxxxxxx",
+  "mobile": "6xxxxxxxx",
   "amount": 10,
   "customReference": "ORDER001",
   "description": "Top-up payment",
@@ -54,7 +54,7 @@ Create a WaafiPay payment (optionally followed by a withdrawal).
     "merchantUId": "your-merchant-id",
     "apiUId": "your-api-user-id",
     "apiKey": "your-api-key",
-    "accountNumberToWithdraw": "2526xxxxxxx"
+    "accountNumberToWithdraw": "6xxxxxxxx"
   }
 }
 ```
@@ -69,7 +69,7 @@ Create a WaafiPay payment (optionally followed by a withdrawal).
   "referenceId": "REF-12345",
   "amount": "10.00",
   "charges": "0.2",
-  "mobile": "2526xxxxxxx",
+  "mobile": "6xxxxxxxx",
   "customReference": "ORDER001",
   "description": "Top-up payment",
   "message": "Payment has been done successfully",
@@ -95,7 +95,7 @@ Withdraw money to a mobile wallet via WaafiPay.
     "merchantUId": "your-merchant-id",
     "apiUId": "your-api-user-id",
     "apiKey": "your-api-key",
-    "accountNumberToWithdraw": "2526xxxxxxx"
+    "accountNumberToWithdraw": "6xxxxxxxx"
   }
 }
 ```
