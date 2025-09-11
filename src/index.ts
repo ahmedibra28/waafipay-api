@@ -81,7 +81,7 @@ app.post('/payments/initialize', async (c) => {
       description: description || purchaseDescription,
     })
 
-    if (response.status === 500) {
+    if (response.status === 500 || !response.params?.transactionId) {
       return getErrorResponse(c, response.message, 500)
     }
 

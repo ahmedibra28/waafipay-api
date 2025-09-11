@@ -64,6 +64,10 @@ export const waafiPayPurchase = async ({
 
     return response
   } catch (error: any) {
-    return error
+    return {
+      ...error,
+      status: error.status || 500,
+      error: error.message || 'Failed to make payment request',
+    }
   }
 }
