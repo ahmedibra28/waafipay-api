@@ -27,7 +27,7 @@ export const waafiPayWithdraw = async ({
 
     // INFO: Allow this if WaafiPay changes their commission structure
 
-    const commission = 0.02
+    const commission = Number(amount) <= 0.18 ? 0 : 0.02
     const providerCommissionAmount = Number(amount) * commission
 
     const withdrawalObject = {
