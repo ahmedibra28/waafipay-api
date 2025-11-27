@@ -38,7 +38,7 @@ export const eDahabPayIssueInvoice = async ({
 
     if (!data.ok)
       throw {
-        message: data.statusText || 'Failed to make payment request',
+        message: data.statusText || 'Failed to make payment',
         status: data.status,
       }
 
