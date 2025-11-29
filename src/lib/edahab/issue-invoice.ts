@@ -3,6 +3,7 @@
 import { EDahabIssueInvoiceProp, EDahabIssueInvoiceResponse } from '@/types'
 import { enc } from 'crypto-js'
 import sha256 from 'crypto-js/sha256'
+import axios from 'axios'
 
 export const eDahabPayIssueInvoice = async ({
   apiKey,
@@ -12,7 +13,7 @@ export const eDahabPayIssueInvoice = async ({
   currency,
   secret,
 }: EDahabIssueInvoiceProp): Promise<
-  EDahabIssueInvoiceResponse & Error & { status: number }
+  EDahabIssueInvoiceResponse & { status?: number }
 > => {
   try {
     const obj = {
@@ -25,38 +26,32 @@ export const eDahabPayIssueInvoice = async ({
 
     const hash = sha256(JSON.stringify(obj) + secret).toString(enc.Hex)
 
-    const data = await fetch(
+    const { data }: { data: EDahabIssueInvoiceResponse } = await axios.post(
       `https://edahab.net/api/api/issueinvoice?hash=${hash}`,
+      obj,
       {
-        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(obj),
       }
     )
 
-    if (!data.ok)
-      throw {
-        message: data.statusText || 'Failed to make payment',
-        status: data.status,
-      }
-
-    const response: EDahabIssueInvoiceResponse & Error & { status: number } =
-      await data.json()
-
-    if (response.InvoiceStatus !== 'Paid' || response.StatusCode !== 0) {
+    if (data.InvoiceStatus !== 'Paid' || data.StatusCode !== 0) {
       throw {
         message:
-          response.ValidationErrors ||
-          response.StatusDescription ||
+          data.ValidationErrors ||
+          data.StatusDescription ||
           'Failed to make payment request',
         status: 500,
       }
     }
 
-    return response
+    return data
   } catch (error: any) {
-    return error
+    return {
+      ...error?.response?.data,
+      status: error?.response?.status || 500,
+      message: error.message || 'Failed to make payment',
+    }
   }
 }

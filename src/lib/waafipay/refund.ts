@@ -3,6 +3,7 @@
 // 2001 => payment has been done successfully
 
 import { WaafiPayProp, WaafiPayResponse } from '@/types'
+import axios from 'axios'
 
 export const waafiPayRefund = async ({
   merchantUId,
@@ -12,7 +13,7 @@ export const waafiPayRefund = async ({
   transactionId,
   description,
   amount,
-}: WaafiPayProp): Promise<WaafiPayResponse & Error & { status: number }> => {
+}: WaafiPayProp): Promise<WaafiPayResponse & { status?: number }> => {
   try {
     const refundObject = {
       schemaVersion: '1.0',
@@ -30,32 +31,29 @@ export const waafiPayRefund = async ({
       },
     }
 
-    const data = await fetch('https://api.waafipay.net/asm', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(refundObject),
-    })
-
-    if (!data.ok)
-      throw {
-        message: data.statusText || 'Failed to make refund request',
-        status: data.status,
+    const { data }: { data: WaafiPayResponse } = await axios.post(
+      'https://api.waafipay.net/asm',
+      refundObject,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        },
       }
+    )
 
-    const response: WaafiPayResponse & Error & { status: number } =
-      await data.json()
-
-    if (response.responseCode !== '2001' || !response?.params?.transactionId) {
+    if (data.responseCode !== '2001' || !data?.params?.transactionId) {
       throw {
-        message: response.params?.description || response.responseMsg,
+        message: data.params?.description || data.responseMsg,
         status: 500,
       }
     }
 
-    return response
+    return data
   } catch (error: any) {
-    return error
+    return {
+      ...error?.response?.data,
+      status: error?.response?.status || 500,
+      responseMsg: error.message || 'Failed to make refund request',
+    }
   }
 }

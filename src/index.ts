@@ -81,8 +81,12 @@ app.post('/payments/initialize', async (c) => {
       description: description || purchaseDescription,
     })
 
-    if (response.status === 500 || !response.params?.transactionId) {
-      return getErrorResponse(c, response.message, 500)
+    if (response.status === 500 || !response?.params?.transactionId) {
+      return getErrorResponse(
+        c,
+        response.responseMsg || 'Payment failed',
+        response.status || 500
+      )
     }
 
     let withdrawResponse: any = null
@@ -96,7 +100,7 @@ app.post('/payments/initialize', async (c) => {
 
       if (withdraw.status === 500) {
         withdrawResponse = {
-          error: withdraw.message,
+          error: withdraw.responseMsg || 'Withdrawal failed',
         }
       }
     }
@@ -177,7 +181,7 @@ app.post('/payments/refund', async (c) => {
     })
 
     if (response.status === 500) {
-      return getErrorResponse(c, response.message, 500)
+      return getErrorResponse(c, response.responseMsg || 'Refund failed', 500)
     }
 
     const newResponse = {
@@ -259,7 +263,11 @@ app.post('/payments/withdraw', async (c) => {
     })
 
     if (withdraw.status === 500) {
-      return getErrorResponse(c, withdraw.message, 500)
+      return getErrorResponse(
+        c,
+        withdraw.responseMsg || 'Withdrawal failed',
+        500
+      )
     }
 
     const newResponse = {
@@ -342,7 +350,11 @@ app.post('/payments/issue-invoice', async (c) => {
     })
 
     if (response.status === 500) {
-      return getErrorResponse(c, response.message, 500)
+      return getErrorResponse(
+        c,
+        response.StatusDescription || 'Issue invoice failed',
+        500
+      )
     }
 
     let withdrawResponse: any = null
@@ -359,7 +371,7 @@ app.post('/payments/issue-invoice', async (c) => {
 
       if (withdraw.status === 500) {
         withdrawResponse = {
-          error: withdraw.message,
+          error: withdraw.TransactionMesage || 'Credit invoice failed',
         }
       }
     }
@@ -441,7 +453,11 @@ app.post('/payments/credit-invoice', async (c) => {
     })
 
     if (response.status === 500) {
-      return getErrorResponse(c, response.message, 500)
+      return getErrorResponse(
+        c,
+        response.TransactionMesage || 'Credit invoice failed',
+        500
+      )
     }
 
     const newResponse = {

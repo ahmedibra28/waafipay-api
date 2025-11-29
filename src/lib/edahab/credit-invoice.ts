@@ -3,6 +3,7 @@
 import { EDahabCreditInvoiceProp, EDahabCreditInvoiceResponse } from '@/types'
 import { enc } from 'crypto-js'
 import sha256 from 'crypto-js/sha256'
+import axios from 'axios'
 
 export const eDahabPayCreditInvoice = async ({
   apiKey,
@@ -12,7 +13,7 @@ export const eDahabPayCreditInvoice = async ({
   secret,
   transactionId,
 }: EDahabCreditInvoiceProp): Promise<
-  EDahabCreditInvoiceResponse & Error & { status: number }
+  EDahabCreditInvoiceResponse & { status?: number }
 > => {
   try {
     const obj = {
@@ -25,36 +26,30 @@ export const eDahabPayCreditInvoice = async ({
 
     const hash = sha256(JSON.stringify(obj) + secret).toString(enc.Hex)
 
-    const data = await fetch(
+    const { data }: { data: EDahabCreditInvoiceResponse } = await axios.post(
       `https://edahab.net/api/api/agentPayment?hash=${hash}`,
+      obj,
       {
-        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(obj),
       }
     )
 
-    if (!data.ok)
-      throw {
-        message: data.statusText || 'Failed to make credit invoice request',
-        status: data.status,
-      }
-
-    const response: EDahabCreditInvoiceResponse & Error & { status: number } =
-      await data.json()
-
-    if (response.TransactionStatus !== 'Approved') {
+    if (data.TransactionStatus !== 'Approved') {
       throw {
         message:
-          response.TransactionMesage || 'Failed to make credit invoice request',
+          data.TransactionMesage || 'Failed to make credit invoice request',
         status: 500,
       }
     }
 
-    return response
+    return data
   } catch (error: any) {
-    return error
+    return {
+      ...error?.response?.data,
+      status: error?.response?.status || 500,
+      message: error.message || 'Failed to make credit invoice request',
+    }
   }
 }
