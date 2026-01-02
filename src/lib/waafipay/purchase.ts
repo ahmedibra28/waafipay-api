@@ -27,11 +27,11 @@ export const waafiPayPurchase = async ({
         apiKey: apiKey,
         paymentMethod: 'MWALLET_ACCOUNT',
         payerInfo: {
-          accountNo: mobile,
+          accountNo: `252${mobile}`,
         },
         transactionInfo: {
           referenceId,
-          invoiceId: `${referenceId.slice(0, 5)}-${mobile}`,
+          invoiceId: `${referenceId.slice(0, 5)}-${`252${mobile}`}`,
           amount: Number(amount),
           currency: 'USD',
           description: description,
